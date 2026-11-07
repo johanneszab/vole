@@ -332,8 +332,21 @@ argument above rather than on any number. The numbers now agree with it.
 | device | VID:PID | what it is |
 |---|---|---|
 | dongle | `3367:1970` | **never** a firmware target; see §6 |
-| mouse, application | `3367:1972` (v1), `3367:1984` (v2) | running its firmware |
-| mouse, bootloader | `3367:1971` (v1), `3367:1983` (v2) | in DFU, `iProduct` "EGG Bootloader" |
+| mouse, application | per model, below | running its firmware |
+| mouse, bootloader | the application PID minus one | in DFU, `iProduct` "EGG Bootloader" |
+
+| model | application | bootloader | evidence |
+|---|---|---|---|
+| OP1w 4k | `3367:1972` | `3367:1971` | both seen to enumerate **[DEV]** |
+| OP1w 4k v2 | `3367:1984` | `3367:1983` | both seen to enumerate **[DEV]** |
+| XM2w 4k | `3367:1968` | `3367:1967` | **[BIN]** only |
+| XM2w 4k v2 | `3367:1982` | `3367:1981` | **[BIN]** only |
+
+> **The bootloader PID is per model, not per generation.** This table used to
+> read "`0x1971` (v1), `0x1983` (v2)", which is true only of the OP1w. The XM2w
+> values come from the config tools' four-entry accept-list (`PROTOCOL.md` §10)
+> and have never been seen on hardware — but `vole-fw` still needs a udev rule
+> for them, or a flash stops dead the moment the mouse re-enumerates.
 
 The bootloader PID is the application PID minus one, and is also readable from a
 running mouse: cmd `0x0E` payload `+4..+5` (`PROTOCOL.md` §8). There are exactly

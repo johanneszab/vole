@@ -30,3 +30,7 @@ KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1982", TAG+="uacc
 KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1971", TAG+="uaccess"
 # OP1w 4k v2     — confirmed on hardware
 KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1983", TAG+="uaccess"
+# XM2w 4k        — inferred, never seen enumerate (PROTOCOL.md section 10)
+KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1967", TAG+="uaccess"
+# XM2w 4k v2     — inferred, never seen enumerate (PROTOCOL.md section 10)
+KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1981", TAG+="uaccess"

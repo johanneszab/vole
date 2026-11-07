@@ -1006,6 +1006,32 @@ likewise share `FUN_004035a0` with each other.
 > The OP1w 4k and OP1w 4k v2 pairs are both confirmed against hardware; the two
 > XM2w entries are inferred from identical code structure.
 
+### The tools accept four identities, not two
+
+Before any device matching, each tool fills a **four-entry** array of
+`VID | PID << 16` words:
+
+    slot 0   mouse, application     0x1972 / 0x1984 / 0x1968 / 0x1982
+    slot 1   mouse, bootloader      0x1971 / 0x1983 / 0x1967 / 0x1981
+    slot 2   dongle                 0x1970
+    slot 3   unknown, dongle-side   0x1969
+
+Four consecutive `MOV dword [global], imm32` stores preceded by `PUSH 4`, in all
+five 4k config tools: XM2w 4k v1.03 at `0x13D4C`, OP1w 4k v1.03 at `0x13D4C`
+and v1.04 at `0x13CFC`, both v2 tools at `0x1660C`. **[BIN]**
+
+Slot 1 is the application PID minus one, and equals the bootloader PID each
+firmware updater opens (`firmware/FIRMWARE.md` §4). That is the only reason the
+XM2w bootloader PIDs `0x1967` and `0x1981` are known at all — no XM2w has been
+tested here.
+
+> **Slots 1 and 3 are written once and never read** — one cross-reference each,
+> against five for slot 0 and eight for slot 2. This is evidence of what the
+> vendor *declares*, not of hardware that exists. `0x1969` is identical in all
+> five tools where slot 1 varies per model, which places it on the dongle side,
+> but nothing in any binary acts on it and no second dongle PID has ever been
+> seen to enumerate. **Do not route on it.**
+
 So **over the dongle, USB IDs do not identify which mouse is attached** — a tool
 sees `3367:1970` whichever of the four is paired. That is resolved, but not by
 USB: **cmd `0x0E` reports the mouse's own VID/PID**, which is the discriminator.
