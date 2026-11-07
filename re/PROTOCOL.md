@@ -90,7 +90,7 @@ issue `GET_REPORT`, and the device fills it in:
 
 ```
 offset  size  field
-   0     1    report ID echo
+   0     1    always 0xA1 — see below, this is NOT an echo of what you asked for
    1     1    status:  0x01 = ready/OK,  0x03 = busy — retry,
                          0x07 = not applicable on this connection (§13),
                          0x08 = mouse unreachable, from 0xB4 (§14),
@@ -99,6 +99,23 @@ offset  size  field
 ```
 
 **Payload always begins at offset 16**, both directions.
+
+> **Byte 0 is always `0xA1`, whichever report you asked for.** On the bulk
+> report you write byte 0 = `0xA0`, issue `GET_REPORT`, and byte 0 comes back
+> `0xA1`. Measured on a v2 over hidraw: both channels answer byte 0 = `0xA1`
+> with the status at byte 1, and `hid_get_feature_report` returns one byte
+> fewer than the buffer it was given (63 of 64, 1040 of 1041). **[DEV]**
+>
+> This is worth stating because it is the one place where a port can be
+> systematically one byte out. On a transport that **prepends** the requested
+> report ID to the data it hands back — WebHID's `receiveFeatureReport()` does
+> — every offset in this table shifts by one and the blob lands at **17**. That
+> is a property of the transport, not of the device and not of a firmware
+> generation. hidraw puts the device's first byte at index 0, and the vendor
+> tool reads the status at `+1` and the blob at `+16`, so Windows does too:
+> in the XM2w 4k v2 tool at `0x31A3`, with the 1041-byte buffer based at
+> `EBP-0x46C`, the status test reads `[EBP-0x46B]` and the 1024-byte
+> `REP MOVSD` sources `[EBP-0x45C]`. **[BIN]** **[DEV]**
 
 Two things to know about responses:
 
